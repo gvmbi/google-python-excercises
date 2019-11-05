@@ -6,6 +6,8 @@
 # Google's Python Class
 # http://code.google.com/edu/languages/google-python-class/
 
+import sys
+
 """Wordcount exercise
 Google's Python class
 
@@ -45,13 +47,49 @@ import sys
 # and builds and returns a word/count dict for it.
 # Then print_words() and print_top() can just call the utility function.
 
+def word_count_dict(filename):
+  words = {}
+  with open(filename, 'r') as f:
+    # text = f.read()
+    # for word in text.split():
+    #   if word not in words:
+    #     words[word] = 1
+    #   else:
+    #     words[word] += 1
+    for line in f:
+      words_on_line = line.split()
+      for word in words_on_line:
+         word = word.lower()
+         if word in words:
+           words[word] += 1
+         else:
+           words[word] = 1
+
+  f.close()
+  return words
+
+def print_words(filename):
+  words = word_count_dict(filename)
+  for key in sorted(words.keys()):
+    print(f"{key} -> {words[key]}")
+
+def get_last_element(t):
+  return t[-1]
+
+def print_top(filename, nbroflines):
+  words = word_count_dict(filename)
+  items = sorted(words.items(), key=get_last_element, reverse=True)
+  for key, value in items[:20]:
+    print(f"{key} -> {value}")
+  return 
+
 ###
 
 # This basic command line argument parsing code is provided and
 # calls the print_words() and print_top() functions which you must define.
 def main():
   if len(sys.argv) != 3:
-    print 'usage: ./wordcount.py {--count | --topcount} file'
+    print('usage: ./wordcount.py {--count | --topcount} file')
     sys.exit(1)
 
   option = sys.argv[1]
@@ -59,9 +97,9 @@ def main():
   if option == '--count':
     print_words(filename)
   elif option == '--topcount':
-    print_top(filename)
+    print_top(filename, 20)
   else:
-    print 'unknown option: ' + option
+    print('unknown option: ' + option)
     sys.exit(1)
 
 if __name__ == '__main__':

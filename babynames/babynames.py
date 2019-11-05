@@ -40,9 +40,26 @@ def extract_names(filename):
   followed by the name-rank strings in alphabetical order.
   ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
   """
-  # +++your code here+++
-  return
-
+  with open(filename, 'r') as f:
+    words = f.read()
+    year = re.search(r'Popularity in (\d\d\d\d)', words).group(1)
+    # <td>1</td><td>Michael</td><td>Jessica</td>
+    names = re.findall(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>', words)        
+    names_dict = {}
+    for number, male_name, female_name in names:
+      if not names_dict.get(male_name):
+        names_dict[male_name] = number
+      elif number > names_dict[male_name]:
+        names_dict[male_name] = number
+      if not names_dict.get(female_name):
+        names_dict[female_name] = number
+      elif number > names_dict[female_name]:
+        names_dict[female_name] = number      
+        
+    names_list = [year]
+    for k in sorted(names_dict):
+      names_list.append("{0} {1}".format(k, names_dict[k]))
+    return names_list
 
 def main():
   # This command-line parsing code is provided.
@@ -51,14 +68,45 @@ def main():
   args = sys.argv[1:]
 
   if not args:
-    print 'usage: [--summaryfile] file [file ...]'
+    print('usage: [--summaryfile] file [file ...]')
     sys.exit(1)
+  
+  
 
   # Notice the summary flag and remove it from args if it is present.
   summary = False
   if args[0] == '--summaryfile':
     summary = True
     del args[0]
+
+    for filename in args:
+      names = extract_names(filename)
+      text = '\n'.join(names)
+
+      if summary:
+        with open(filename + '.summary', 'w') as f:
+          f.write(text + '\n')
+        f.close()
+      else:
+        print(text)
+
+  
+
+  # if summary == True:
+  #   for filename in args:
+  #     contents = ''
+  #     year_name_list = extract_names(filename)
+  #     for line in year_name_list:
+  #       contents += line + '\n'
+  #     filename_summary = filename + '.summary'        
+  #     with open(filename_summary, 'w') as f:
+  #       f.write(contents)
+        
+  # else:
+  #   for filename in args:
+  #     year_name_list = extract_names(filename)
+  #     for line in year_name_list:
+  #       print(line, sep='')
 
   # +++your code here+++
   # For each filename, get the names, then either print the text output
